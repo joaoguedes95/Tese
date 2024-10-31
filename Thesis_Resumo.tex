@@ -1,0 +1,26 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+%     File: Thesis_Resumo.tex                                          %
+%     Tex Master: Thesis.tex                                           %
+%                                                                      %
+%     Author: Andre C. Marta                                           %
+%     Last modified :  2 Jul 2015                                      %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Resumo}
+
+% Add entry in the table of contents as section
+\addcontentsline{toc}{section}{Resumo}
+
+O PTP é um protocolo apresentado pela IEEE para auxiliar na sincronização dos relógios internos de diferentes dispositivos a comunicar numa rede. Para isso, os dispositivos a sincronizar trocam entre si mensagens portadoras da informação do instante de transmissão entre as mesmas. Efectuando cálculos com os referidos instantes de transmissão, os dispositivos conseguem descobrir o tempo de propagação das mensagens entre os mesmos e com isso ajustar adequadamente os seus relógios internos \par
+Uma segunda iteração da norma foi introduzida em 2008 denomindada PTPV2. A sua principal vantagem foi a introdução do \textit{Transparent Clock} que é um modo de execução do PTP pensado para dispositivos de reencaminhamento nas redes como comutadores e roteadores. A implementação nestes do modo de funcionamento como \textit{Transparent Clock} permite aos restantes dispositivos compensarem a variabilidade dos atrasos das mensagens nos primeiros aumentando a precisão da sincronização. \par
+Esta tese apresenta uma arquitectura para um comutador de Ethernet com suporte para o funcionamento como \textit{Transparent Clock}, visando a sua instalação numa subestação elétrica. O comutador deverá mais tarde ser complementado com outros protocolos relevantes na indústria de distribuição de energia gerando um produto com potencial comercial que se encontra em falta no mercado. 
+
+
+
+
+\vfill
+
+\textbf{\Large Palavras-chave:} Ethernet, comutador, Verilog, PTP, FPGA
+

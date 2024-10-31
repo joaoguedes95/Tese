@@ -1,0 +1,67 @@
+\chapter{Verificação do comutador}
+
+\section{Princípios de verificação}
+
+Após a descrição em Verilog do comutador é inevitável proceder a uma verificação exaustiva da correta funcionalidade do mesmo por forma a garantir o seu correto funcionamento em ambiente real, ou seja, no caso desta dissertação, em FPGA. Verificar o comutador estimulando-o trama a trama e observando as formas de onda dos sinais que servem como interface do mesmo pode dar uma primeira perspectiva do estado do mesmo, mas não é suficiente para garantir o seu correto funcionamento num ambiente real, na presença de tramas e erros de variados tipos. O \textit{testbench} deve ser capaz de cobrir o máximo do espaço de estímulos dos ambientes previsíveis de utilização do design desenvolvido, denominados de casos de teste, e proceder a uma validação autónoma da funcionalidade do mesmo nos vários ambientes. Para alcançar esta versatilidade, escalabilidade, e diminuir o tempo de desenvolvimento do mesmo, o \textit{testbench} deve ser dividido em várias componentes passíveis de reutilização em diferentes cenários e casos de teste. \par
+O desenvolvimento de um \textit{testbench} em Verilog dificilmente não conduz unicamente à elaboração de testes diretos e a um formato monolítico do mesmo. Assim, é fulcral que o \textit{testbench} seja desenvolvido com uma linguagem possuidora de capacidades superiores de verificação. A linguagem usada na indústria e criada para esse propósito é o SystemVerilog \cite{SV}. Esta foi construida tendo Verilog como base e partilhando todas as suas capacidades de desenvolvimento, possuindo ainda capacidades adicionais ao nível de verificação, sendo por isso considerada, simultaneamente, uma linguagem de descrição de \textit{hardware} e uma linguagem de verificação de \textit{hardware}. As principais vantagens do SystemVerilog são a introdução de mecanismos de aleatoriedade, que permitem com maior facilidade abranger um vasto conjunto de estímulos diferentes no design, e o suporte para uma programação orientada por objectos que o dota da capacidade de ser usado para desenvolver \textit{testbenchs} com várias componentes passíveis de reutilização.\par
+A estrutura típica de um \textit{testbench} desenvolvido em SystemVerilog foi, inicialmente, formulada no "\textit{Verification Methodoly Manual}" (VMM) \cite{VMM} e consolidada na metodologia UVM("\textit{Universal Verification Methodology}") \cite{UVM}, sem alterações a nível conceptual. Esta é hierárquica, dividindo o \textit{testbench} em várias camadas, onde as camadas superiores operam em níveis acrescidos de abstração. Os vários módulos presentes no \textit{testbench} trocam pacotes de informação representativos dos estímulos a injetar na DUT e das respostas capturadas denominados transações. O formato e conteúdo das transações pode ser variável consoante a posição na hierarquia das classes a comunicar, aumentando em detalhe quando na posse das classes de posição mais baixa na hierarquia.
+
+\begin{itemize}
+  \item \textit{DUT}  - \quad Abreviatura para "\textit{Design Under Test}", tipicamente usada para referir ao design que se está a verificar.  
+  \item \textit{Environment}  - \quad Classe onde são construidos as várias classes do \textit{testbench}, separando-as do teste. 
+  \item \textit{Driver}  - \quad Classe que contém os métodos que traduzem a informação contida numa transação para os vetores de bit's representativos da transação que são introduzidos nas interfaces correspondes da DUT.
+  \item \textit{Monitor} -\quad Classe responsável por analisar os sinais à saida do DUT e comunicar os resultados à \textit{Scoreboard} para análise.
+  \item \textit{Agent} -\quad Classe que recebe as transações originárias do \textit{Generator} e invoca os métodos das \textit{Driver}'s adequadas para produzirem a estimulação da DUT com as respetivas transações. Mais ainda, tipicamente, também é responsável por entregar as mesmas transações à \textit{Scoreboard}.
+  \item \textit{Generator} -\quad Classe responsável por criar transações relevantes para a a verificação da DUT. Dependendo da complexidade do \textit{testbench} e da metodologia a ser seguida pode ser subdividido em dois módulos. Uma \textit{Sequence} responsável por criar uma transação singular e o \textit{Sequencer} responsável por requerer ao \textit{Sequence}, com as restrições necessárias, as transações indicadas para criar um cenário de teste. 
+  \item \textit{Scoreboard} -\quad Classe que verifica se os sinais capturados à saída da DUT são os desejados para o teste a ser executado. Normalmente incluem o modelo de referência da DUT que simula o comportamento desejável na mesma. Os resultados capturados à saída da DUT são comparados com os previstos pelo modelo de referência para validar a correta funcionalidade da DUT.
+  \item \textit{Test} -\quad Classe que inicializa o \textit{Environment} com as restrições e condições adequadas aos vários casos de teste. 
+\end{itemize}
+
+\section{\textit{Testbench} elaborado}
+
+O primeiro passo na elaboração de um \textit{testbench} é definir os casos de teste e as métricas que se pretendem obter após a execução do \textit{testbench}. O comutador desenvolvido apenas tem a capacidade de interagir com as tramas portadoras de mensagens do PTP, sendo por isso irrelevante para a elaboração do \textit{testbench} qual o protocolo e conteúdo das restantes tramas.  Por sua vez, a interação com as tramas portadoras de mensagens do PTP depende do modo de operação do comutador. Assim, definiram-se dois casos de teste que consistem na implementação do comutador nos dois diferentes modos de execução do PTP. \par
+
+O \textit{testbench} foi desenvolvido tendo por base transações representativas de tramas. Os valores destes campos são escolhidos de forma aleatório pelo \textit{generator}. Como as tramas são recebidas e enviadas em portos, para aumentar a escalabilidade e simplicidade de implementação do \textit{testbench} este foi construido com um \textit{generator}, \textit{agent}, \textit{driver} e \textit{monitor} por porto. A estratégia para verificar a correta funcionalidade do comutador passa por introduzir neste tramas unívoca e imediatamente identificáveis, registar o evento, e compara-las posteriormente com as tramas enviadas pelo comutador. A identificação das tramas é conseguida inserindo um código exclusivo da trama nos primeiro três octetos do campo de dados da mesma. Os identificadores necessários para cobrir todas as tramas criadas durante a execução do \textit{testbench} são gerados no \textit{environment} e entregues aos vários \textit{agents} previamente ao início dos testes. Um único tipo de transação representativo de tramas foi definido para ser trocado entre as várias classes do \textit{testbench}. As variáveis presentes na transação são os vários campos de dados do cabeçalho da trama, o comprimento do campo de dados e o referido identificador da trama. Para as tramas do PTP faz ainda parte da transação os campos de dados das mensagens do PTP. As tramas são criadas num \textit{generator} a pedido do \textit{agente} do respectivo porto. O \textit{generator} inclui métodos distintos para gerar transações representativas de tramas genéricas, tramas \textit{Sync}, tramas \textit{Follw\_Up}, tramas \textit{Delay\_Req}, tramas \textit{Delay\_Resp}, tramas \textit{PDelay\_Req}, tramas \textit{PDelay\_Resp} e tramas \textit{PDelay\_Resp\_Follow\_Up}. Após a recepção da transação no \textit{agent} este invoca os métodos da \textit{driver} que introduzem no comutador a trama representada pela transação. Tal como o \textit{generator}, este possui diferentes métodos consoante a transação represente uma trama genérica ou uma das várias tramas do PTP. A \textit{driver} inclui ainda a capacidade de inserir no comutador erros no PHY, CRC ou comprimento das tramas quando assim indicado pelo \textit{agent}. A periodicidade média do envio das tramas e da inserção de erros foi parametrizada no \textit{testbench} para permitir testar um conjunto mais diverso de cenários. As transações são também entregues à \textit{scoreboard} quando as tramas respetivas são introduzidas sem erros no comutador. \par 
+Para capturar as tramas reencaminhadas pelo comutador, o \textit{testbench} inclui um \textit{monitor} por porto. Estes possuem um método responsável por capturar os vários campos de uma trama que é ativado no momento do flanco ascendente do sinal TXEN da interface GMII do respetivo porto. No final da recepção da trama, o \textit{monitor} cria uma transação que represente a respetiva trama e transmite-a para a \textit{scoreboard} juntamente com a informação da ocorrência ou ausência de erros. Os erros passíveis de identificação pelo \textit{monitor} são os três erros possíveis existentes em tramas de Ethernet, e a quebra do padrão definido para o campo de dados das tramas que não sejam do PTP. \par
+A validação da correta execução do PTP e do reencaminhamento das tramas para os portos corretos é confirmada na \textit{scoreboard}. Para isso, a \textit{scoreboard} mantém uma lista por porto de transações que representem as tramas esperadas nesses portos. Essas listas são atualizadas no instante em que um \textit{agente} comunica à \textit{scoreboard} a introdução de uma trama no comutador.  Quando a trama não inclui uma mensagem do PTP, a \textit{scoreboard} apenas precisa analisar o endereço de destino da transação que representa a trama introduzida e adicionar a transação à lista de transações esperadas no respetivo porto. Para transações que representem tramas portadoras de mensagens do PTP, é computada uma transação esperada segundo as regras do protocolo explicadas em capítulos anteriores. Alguns campos da transação só são computados após a recepção da trama correspondente no \textit{monitor} e posterior comunicação à \textit{scoreboard}. O \textit{meanLinkDelay} dos vários portos do comutador, necessário para uma correta validação da execução do PTP port parte do comutador, é calculado de cada vez que uma trama \textit{Delay\_Resp}, \textit{PDelay\_Resp} e \textit{PDelay\_Resp\_Follow\_Up} é introduzida no comutador por uma \textit{driver}  \par
+Para auxliar na decisão de término da execução do \textit{testbench} todos os \textit{monitors} incluem um contador que conta o tempo entre a última trama recebida e o instante de simulação presente. Quando esse valor ultrapassa um limiar previamente definido nos contadores de todos os monitores a execução do \textit{testbench} é terminada e os resultados obtidos são disponibilizados no terminal do Vivado.
+
+
+\section{Latência e largura de banda obtidos}
+
+
+Após a verificação permitir ter uma confiança elevada no funcionamento sem erros do comutados, o \textit{testbench} foi ampliado com a capacidade de calcular as latências e a largura de banda do comutador para diferentes tipos de tráfego. 
+
+\begin{enumerate}
+\item Tráfego ligeiro num único porto -\quad 
+\item Tráfego exaustivo num único porto -\quad 
+\item Tráfego ligeiro em todos os portos -\quad 
+\item Tráfego exaustivo em todos os portos -\quad 
+\end{enumerate}
+
+
+Na tabela 6.1 podem ser observados os valores da latência e da largura de banda oferecidos pelo comutador para diferentes configurações dos parâmetros do mesmo e de volume de tráfego. Foram definidos quatro tipos de tráfego:
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|}
+
+    \hline
+    &    \\
+    \hline
+     & \\
+    \hline
+     &   \\
+    \hline
+     &   \\
+    \hline
+     &  \\
+    \hline
+     &  \\
+    \hline
+    
+\end{tabular}
+\end{center}
+\caption{Latência e largura de banda do comutador}\label{Latência e largura de banda do comuatdor}
+\end{table}
+

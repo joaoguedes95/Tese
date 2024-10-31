@@ -1,0 +1,29 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+%     File: Thesis_Abstract.tex                                        %
+%     Tex Master: Thesis.tex                                           %
+%                                                                      %
+%     Author: Andre C. Marta                                           %
+%     Last modified :  2 Jul 2015                                      %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Abstract}
+
+% Add entry in the table of contents as section
+\addcontentsline{toc}{section}{Abstract}
+
+Electrical substations are an essential element in the operation of the electricity grid, contributing to a stable and safe supply of electricity to all types of consumers. 
+A substation has various communication systems to control and monitor its operation. Some of the main communications found in a substation are associated with supervision and control systems and safety and protection systems.  
+The supervision and control systems are responsible for monitoring the general state of the substation and controlling the flow of energy in the electrical network. These systems must detect faults in equipment or processes and take corrective measures to minimize their impact. Safety and protection systems are responsible for monitoring voltage and current levels throughout the substation and shutting down equipment when abnormal conditions occur (voltage spikes, failure of one of the lines, etc.). 
+Technological advances have meant that only data acquisition is analog, with supervision, control and communications being completely digital. \par The work to be carried out as part of this thesis will focus exclusively on the communications module, based on Ethernet protocols. 
+As substations are considered critical systems, the Ethernet protocols used are based on redundancy, in order to guarantee immunity to at least one failure. The existing communications module already supports the specific Ethernet protocols for these critical applications. 
+This work aims to expand the communications module so that it acts as an Ethernet Switch with a number of ports to be defined (the current module only has two Ethernet ports). In addition, it is also intended to include high-precision time synchronization (1 us), based on the PTP protocol ("Precision Time Protocol", IEEE 1588 standard). 
+To this end, a Verilog description of the algorithms should be developed, which should be synthesizable for any Intel/Altera FPGA. 
+Initially, validation will be carried out using logic simulation and, at a later stage, validation will be carried out in a laboratory environment using FPGA development boards.
+
+
+\vfill
+
+\textbf{\Large Keywords:} Ethernet, switch, Verilog, PTP, FPGA
+

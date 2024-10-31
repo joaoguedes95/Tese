@@ -1,0 +1,46 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+%     File: Thesis_Introduction.tex                                    %
+%     Tex Master: Thesis.tex                                           %
+%                                                                      %
+%     Author: Andre C. Marta                                           %
+%     Last modified : 13 May 2019                                      %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Introdução}
+\label{chapter:introduction}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Enquadramento}
+Subestações elétricas são uma infraestrutura fulcral dos sistemas de geração e distribuição de energia. Com os avanços tecnológicos, as funções de monitorização e controlo das subestações foi maioritariamente automatizada culminando no aparecimento dos sistemas de automação de subestações (SAS) \cite{SAS}. Nestes, a recolha de dados de equipamentos e o controlo seu é efectuada por diversos dispositivos inteligentes supervisionados e orquestrados por sistemas SCADA (\textit{Supervisory Control and Data Acquisition}). Por forma a integrar componentes que possam ser provenientes de diferentes fabricantes, foi criada a norma IEC 61850 que define os protocolos de comunicação e os requisitos tecnológicos para dispositivos em SAS.    \par 
+Para alguns dos protocolos e equipamentos o IEC 61850 definiu requisitos de sincronização na ordem do millisegundo. Para o assegurar duas técnicas eram aplicadas \cite{Electrical}. A mais comum era a conhecida por IRIG-B que consiste na transmissão de pulsos sobre um cabo coaxial ou fibra ótica dedicada. Nos pulsos é transmitida informação relativa à data e hora do instante. O IRIG-B permite alcançar precisões ainda superiores a 1 ms, mas requer a inclusão de \textit{hardware} dedicado. Alternativamente, era também usada a técnica 1-pulse-per-second. Esta consiste no envio de um pulso muito preciso, mas não transmite informação relativa à data e hora.\par 
+Atualmente, com os avanços nos requisitos impostos às unidades de medições de fasor tornou-se necessária uma precisão de sincronização de 1 $\mu$s o que impôs a adoção por parte do IEC 61850 do \textit{Precision Time Protocol} (PTP) \cite{PTP} como protocolo de eleição para sincronização em SAS. O PTP consegue atingir a precisão requerida na sincronização com recurso a \textit{hardware} capaz de manipular mensagens definidas na norma e de registar o momento de recepção e envio das mensagens. A inclusão do \textit{hardware} dedicado apenas marginalmente aumenta o custo de um dispositivo. Mais ainda, o PTP aumenta a redundância ao nível das fontes de sincronização, reduz a quantidade de meios necessários para transmitir os sinais responsáveis pela sincronização, compensa os atrasos nos caminhos e transmite informação sobre data e hora \cite{comparison}. \par 
+
+\section{Motivação}
+\label{section:motivation}
+
+ As redes de computadores operam sobre um substrato de protocolos definidos por entidades competentes que devem ser seguidos pelos vários elementos pertencentes à rede para garantir a sua interoperabilidade e eficiência. Atualmente, para servir de meio de comunicação entre os vários elementos de uma SAS vêm sendo adotadas as redes de \textit{Ethernet} \cite{ethernet}. As várias regras das redes de \textit{Ethernet} estão definidas na norma e devem ser cuidadosamente respeitadas. \par 
+A \textit{Ethernet} tem como elemento fundamental o comutador. Os comutadores são os nós centrais da rede, responsáveis por encaminhar tramas portadoras de informação entre os vários elementos terminais da rede. No entanto, a variabilidade nos tempos de residência das tramas nos comutadores introduz erros na sincronização dos restantes dispositivos através do PTP. Para minimizar esses erros foi introduzida nas versões mais recentes da norma do PTP o modo de atuação como \textit{Transparent Clock}. \par 
+A motivação para este projeto passa por desenvolver um comutador de \textit{Ethernet} com suporte para o funcionamento como \textit{Transparent Clock}, visando a sua instalação futura numa SAS. O projeto está incluído no âmbito de um Plano de Recuperação e Resiliência (PRR) denominado Aliança para a Transição Energética (ATE) liderado pela EFACEC.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objectivos}
+\label{section:overview}
+
+O objectivo desta dissertação consiste em elaborar uma descrição RTL (\textit{Register Transfer Logic}) em Verilog do comutador, que posteriormente deverá ser sintetizável para uma FPGA (\textit{Field-programmable Gate Array}) da Intel. Previamente será necessário decidir a arquitectura do comutador. Para isso, serão estudadas diferentes formas de o implementar, e tidas em conta as suas vantagens e relevância neste contexto. A correta operacionalidade do comutador deverá estar garantida aquando da finalização desta dissertação, por isso o seu funcionamento será extensamente verificado com uma simulação em \textit{software}.
+
+\iffalse
+\section{Trabalho do autor}
+Parte do trabalho desenvolvido nesta dissertação decorreu no âmbito da atribuição ao autor de uma bolsa de iniciação científica por parte do INESC-ID.
+\fi
+
+\section{Estrutura da dissertação}
+
+Esta dissertação incluirá mais 7 capítulos. No segundo capítulo serão explicados os princípios básicos do PTP, onde se inclui os vários tipos operações que podem ser executadas por dispositivos com suporte para o algoritmo e de que forma as mesmas conduzem à sincronização dos relógios internos. No capítulo seguinte será dada uma introdução à \textit{Ethernet} e, mais especificamente, aos comutadores. Uma arquitectura para o comutador será proposta no capítulo 4.
+No capítulo 5 revelar-se-à o resultado final do trabalho desenvolvido neste projeto. A correta operacionalidade será demonstrada no capítulo 6 com a inclusão de simulações em \textit{software}. Etapas adicionais necessários para alcançar uma implementação em FPGA serão detalhadas no capítulo 7. Para finalizar, capítulo 8, será feita uma retrospetiva do trabalho realizado, e identificação de limitações que deverão ser suprimidas futuramente.
+

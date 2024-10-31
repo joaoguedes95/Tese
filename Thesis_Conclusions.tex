@@ -1,0 +1,125 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                      %
+%     File: Thesis_Conclusions.tex                                     %
+%     Tex Master: Thesis.tex                                           %
+%                                                                      %
+%     Author: Andre C. Marta                                           %
+%     Last modified :  2 Jul 2015                                      %
+%                                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Execução do PTP}
+\label{chapter:conclusions}
+
+O dispositivo a desenvolver deverá, numa primeira fase, atuar como \textit{Transparent Clock}, podendo ser posteriormente adicionado o suporte para um funcionamento misto como \textit{Transparent Clock} e \textit{Boundary Clock}. Mais ainda, ainda que o PUP apenas imponha a suporte do mecanismo P2P, tanto este como o E2E serão implementados. Os referidos mecanismos são postos em prática através da manipulação das mensagens já explicadas, substituindo os vários campos do corpo e cabeçalho das mesmas por instantes de tempo de envio e receção de mensagens e demais dados armazenados na instância. Os vários campos de dados presentes nos cabeçalhos das várias mensagens do PTP são os seguidamente referidos.  
+
+\begin{itemize}
+  
+  \item \textit{Version PTP}  - \quad Identificador da versão do PTP em execução no domínio. 
+  \item \textit{\textit{Domain Number}} - \quad Mecanismo primordial para isolamento e identificação de um domínio por parte de utilizadores e dispositivos.
+  \item \textit{\textit{Sdo Id}}  - \quad Campo que transmite informação relativa à identificação do domínio em complementaridade com o campo \textit{Domain Number}.
+  \item \textit{Message Type} - \quad Identificador do tipo de mensagem.
+  \item \textit{Flag Field}  - \quad Campo no qual os vários bits funcionam como \textit{flags} sinalizadoras de propriedades da execução do PTP por parte das instâncias envolvidas na transmissão da mensagem.
+  \item \textit{Correction Field}  - \quad Campo que, como explicado num capítulo anterior, transmite informação relativa aos instantes de tempo de transmissão e receção de mensagens da classe evento.
+  \item \textit{Source Port Identity} - \quad Identificador do porto PTP percecionado como originador da mensagem.
+  \item \textit{Sequence Id}  - \quad Identificador usado para coordenar o envio de mensagens da classe evento e a aplicação da informação das mesmas nos cálculos dos atrasos e desfasamentos. 
+  \item \textit{Log Message Interval}  - \quad Campo que pode transmitir informação relativa à periodicidade requerida de envio de mensagens dos vários tipos.
+\end{itemize}
+
+No que diz respeito ao corpo das mensagens, estão definidos na norma os campos de dados apresentados na tabela 5.1:
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l| l|l|}
+
+    \hline
+    Mensagem & Campo de Dados & Conteudo \\
+    \hline
+     \textit{Sync} & \textit{Origin Timestamp} & Instante de transmissão da respetiva mensagem \textit{Sync} \\
+    \hline
+    \multirow{2}{*}{\textit{Follow\_Up}} & \multirow{2}{*}{\textit{Precise Origin Timestamp}} & Instante de transmissão da mensagem \textit{Sync} correspondente  \\
+    & & em modo \textit{Two-Way} \\
+    \hline
+    \textit{Delay\_Req} & \textit{Origin Timestamp} & Instante de transmissão da respetiva mensagem \textit{Delay\_Req} \\
+    \hline
+    \multirow{3}{*}{\textit{Delay\_Resp}} & \textit{Receive Timestamp} & Instante de receção
+    da mensagem \textit{Delay\_Req} no \textit{Master}\\
+    \cline{2-3}
+    & \multirow{2}{*}{\textit{Requesting Port Identity}}  &  Campo que transmite a identificação do porto que enviou a \\
+    &   &  mensagem \textit{Delay\_Req} à qual se está a responder\\
+    \hline
+    \textit{PDelay\_Req} & \textit{Origin Timestamp} & Instante de transmissão da respetiva mensagem \textit{PDelay\_Req} \\
+    \hline
+     \multirow{3}{*}{\textit{PDelay\_Resp}} & \textit{Request Receipt Timestamp} & Instante de receção
+    da mensagem \textit{PDelay\_Req} \\
+    \cline{2-3}
+    & \multirow{2}{*}{\textit{Requesting Port Identity}}  &  Campo que transmite a identificação do porto que enviou a \\
+    &   &  mensagem \textit{PDelay\_Req} à qual se está a responder\\
+    \hline
+    \multirow{4}{*}{\textit{PDelay\_Resp}} & \multirow{2}{*}{\textit{Response Origin Timestamp}} & Instante de transmissão da mensagem \textit{PDelay\_Resp}  \\
+    & & correspondente em modo \textit{Two-Way} \\
+    \cline{2-3}
+    & \multirow{2}{*}{\textit{Requesting Port Identity}}  &  Campo que transmite a identificação do porto que enviou a \\
+    &   &  mensagem \textit{PDelay\_Req} à qual se está a responder\\
+    \hline
+    
+    \hline
+\end{tabular}
+\end{center}
+\caption{Campos de dados das mensagens}\label{Campos de dados das mensagens}
+\end{table}
+
+\section{Processamento das mensagens}
+A execução do PTP decorre sobre a divisão lógica de uma rede em domínios. Por forma a isolar os diferentes domínios numa mesma rede, todas as mensagens que circulam num domínio devem ter a mesma combinação dos parâmetros \textit{sdoId} e \textit{domainNumber}, que devem diferir entre os vários domínios. No momento de receção de uma mensagem por parte de uma instância, uma mensagem apenas deve ser considerada para posterior processamento e reencaminhamento quando os respetivos campos \textit{sdoId} e \textit{domainNumber} correspondem com aqueles guardados internamente nas estruturas de dados das instâncias. \par
+Uma descrição detalhada do procedimento a adotar pelo \textit{switch} aquando da receção dos vários tipos de mensagens é apresentada seguidamente.
+
+\textbf{\textit{Sync}} Aquando da receção de uma mensagem \textit{Sync} o \textit{switch} deve adicionar ao \textit{correctionField} da mesma o tempo de residência e, no modo P2P, o tempo de propagação entre si e o último dispositivo com suporte para o mecanismo P2P que manipulou a mensagem. \par
+
+\textbf{\textit{Follow\_Up}} A mensagem deve ser reencaminha sem proceder a manipulações da mesma. \par
+
+\textbf{\textit{Delay\_Req}} A mensagem deve ser descarta em modo P2P. Em modo E2E deve ser reencaminha em modo \textit{broadcast} e adicionado o tempo de residência da mensagem ao \textit{correctionField} da mesma. \par
+
+\textbf{Delay\_Resp} A mensagem deve ser tratada da mesma forma que a mensagem \textit{Delay\_Req}. \par
+
+\textbf{\textit{PDelay\_Req}} Aquando da receção de uma mensagem \textit{PDelay\_Req} em modo P2P, se a mesma passar as validações necessárias, deverá ser prepara uma mensagem do tipo \textit{PDelay\_Resp} para envio o mais prontamente possível. O \textit{Sequence Id} e o \textit{Source Port Identity} da mensagem \textit{PDelay\_Req} devem ser inseridos respetivamente nos campos \textit{Sequence Id} e \textit{Requesting Port Identity} da mensagem \textit{PDelay\_Resp}. Esses dois campos serão posteriormente analisados pelo criador da mensagem \textit{PDelay\_Req}, por forma a concluir que a \textit{PDelay\_Resp} é enviada em resposta precisamente à sua mensagem \textit{PDelay\_Res}. O \textit{correctionField} deverá ser o somatório entre o \textit{correctionField} da mensagem \textit{PDelay\_Req} e a diferença entre o instante de transmissão da mensagem \textit{PDelay\_Resp} e de transmissão da mensagem \textit{PDelay\_Req}. Por sua vez, em modo E2E, deverá ser reencaminhada em modo \textit{broadcast}, e adicionado o tempo de residência ao \textit{correctionField} da mesma.
+
+\textbf{\textit{PDelay\_Resp}} A mensagem deverá ser descartada quando o modo de operação é P2P. No entanto, quando o conteúdo da mensagem se encontra em conformidade com o devido quando a mensagem se destina ao \textit{switch}, deverão ser acionados os cálculos do tempo de propagação entre o \textit{switch} e a instância que criou a mensagem. Em modo E2E, deverá ser reencaminhada em modo \textit{broadcast}, e adicionado o tempo de residência ao \textit{correctionField} da mesma. 
+
+\textbf{\textit{PDelay\_Resp\_Follow\_Up}} Tal como na receção de uma mensagem \textit{PDelay\_Resp} em modo P2P, a mensagem deverá ser descartada, ainda que possa acionar os cálculos do tempo de propagação. Em modo E2E, deverá ser reencaminhada em modo \textit{broadcast}, e adicionado o tempo de residência ao \textit{correctionField} da mesma.
+
+\textbf{\textit{Management}} A mensagem deverá ser reencaminhada ou, se tiver o \textit{switch} como destinatário, ser descartada. \par
+
+\textbf{Signaling} Tal como a mensagem \textit{Management}, deverá ser reencaminhada ou descartada quando o \textit{switch} for o seu destinatário. \par
+
+O cálculo do tempo de propagação entre os vários PTP \textit{ports} do \textit{switch} e as instâncias vizinhas com suporte para o mecanismo P2P ocorre aquando da receção de uma mensagem \textit{PDelay\_Resp}, ou da respetiva \textit{PDelay\_Resp\_Follow\_Up} num porto a operar no modo P2P, e deverá ser guardado na estrutura de dados denominada de \textit{meanLinkDelay}. Aquando da receção de uma mensagem \textit{PDelay\_Resp}, é verificado o valor de um bit específico do campo \textit{Flag Field} da mesma, denominado \textit{Two Step Flag}. Quando este bit vem a 0, significa isto que a instância responsável por enviar a mensagem está a operar no modo \textit{One-Way} e que a totalidade da informação gerada pela respetiva instância necessária para calcular o tempo de propagação já se encontra incluída na mesma. Consequentemente, o tempo de propagação é calculado com a fórmula 5.1, onde t1 representa o instante de receção da mensagem \textit{PDelay\_Resp}, e t4 o instante de transmissão da mensage \textit{PDelay\_Req}.
+
+\begin{equation}
+    meanLinkDelay = \dfrac{(t4 - t1) - PDelay\_RespCorrectionField}{2} 
+\end{equation}
+
+Inversamente, quando o \textit{Two Step Flag} tem o valor 1, a instância que gerou a mensagem \textit{PDelay\_Resp} está a operar no modo de funcionamento. Devido a isso, a informação do instante de transmissão da mensagem \textit{PDelay\_Resp} não se encontra na mesma e não é disponibilizada ao \textit{switch}. Assim, o \textit{switch} não procede aos cálculos do tempo de propagação, esperando pela chegada de uma mensagem \textit{PDelay\_Resp\_Follow\_Up} com o mesmo \textit{Sequence Id} da mensagem \textit{PDelay\_Resp}. No momento de receção da mesma, o tempo de propagação é calculado com a fórmula 4.2.
+
+
+
+
+    \begin{equation}
+    \begin{split}
+         meanLinkDelay = & ((t4 - t1) - (responseOriginTimestamp -requestReceiptTimestamp ) \\ & - PDelay\_RespCorrectionField - \\ 
+    & PDelay\_Resp\_Follow\_UpCorrectionField) / 2
+    \end{split}
+    \end{equation}
+    
+
+\section{Estrutura da instância}
+
+Para uma correta execução das funcionalidades fundamentais do protocolo é apenas exigido às instâncias que manipulem e enviem as mensagens como definido na normal quando a comunicar com instâncias que não foram especialmente desenvolvidas para comunicar entre si. No entanto, entre duas instâncias vizinhas, estas podem proceder a uma comunicação com regras e técnicas próprias se para isso forem previamente desenvolvidas, e essa comunicação poder ser escondida das restantes instâncias. Tais situações estão previstas na norma, por isso, é dada bastante liberdade de escolha na execução do PTP e implementação das instâncias.\par 
+No entanto, ainda que esta não tenha que ser estritamente seguida, a norma sugere qual deve ser a estrutura interna dos vários tipos de instância, tais como os \textit{Transparent Clocks}. Os vários módulos cuja implementação é sugerida são os seguidamente referidos. \par 
+
+\textbf{\textit{Network Interface Stack}} Módulo responsável por capturar os instantes de tempo de receção e transmissão das mensagens da classe evento.
+
+\textbf{PTP \textit{Port Block}} Módulo responsável pelas funcionalidades de um PTP \textit{Port} que não sejam dependentes das regras do meio de comunicação. Entre outras funções deve manter as estruturas de dados referentes a um PTP\textit{Port} e gerar as mensagens da classe evento. 
+
+\textbf{\textit{Common Core}} É sugerido o desenvolvimento de um módulo central que comunique com os vários PTP \textit{Ports} presentes na instância. Este deve ser responsável por gerenciar as estruturas de dados presentes na instância que não se restrinjam a um único PTP \textit{Port} e providencia-las aos mesmos. No caso de \textit{Ordinary Clocks} e \textit{Boundary Clocks} deve ainda ser responsável por aspetos do BMC que requeiram informação dos vários PTP \textit{Ports}.
+
+\textbf{\textit{Media Dependent Adapter}} Para dar a uma mensagem o formato adequando ao meio de comunicação onde se encontra a instância é sugerido este módulo. No caso da implementação de um dispositivo numa rede \textit{Ethernet}, o módulo deve inserir a mensagem no campo de dados de uma trama e preencher os restantes campos adequadamente.  
